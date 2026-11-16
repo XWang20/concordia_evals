@@ -279,12 +279,27 @@ def write_compose_file(
     task_data_dir: Path,
     script_dir: Path,
     compose_dir: Path = COMPOSE_DIR,
+    setup_proxy: str | None = None,
 ) -> str:
     """Write a per-sample Docker Compose file and return its path.
 
     The task data and scripts are mounted read-only; the setup solver copies
     what it needs into the container's writable layer.
     """
+    extra_hosts_lines = '                  - "fate-suite.ffmpeg.org:127.0.0.1"'
+    if setup_proxy is not None:
+        extra_hosts_lines += '\n                  - "hostgw:host-gateway"'
+    proxy_env_block = ""
+    if setup_proxy is not None:
+        proxy_env_block = f"""
+                # Proxy for the setup phase only (prepare.sh fetches git/http
+                # deps; upstream runs this phase with real internet). After
+                # setup, network_lockdown disconnects all networks anyway, so
+                # the proxy is unreachable during the agent phase.
+                environment:
+                  - HTTP_PROXY={setup_proxy}
+                  - HTTPS_PROXY={setup_proxy}
+                  - NO_PROXY=127.0.0.1,localhost"""
     compose_dir.mkdir(parents=True, exist_ok=True)
     compose_file = compose_dir / f"{sample_slug}.yaml"
     compose_file.write_text(
@@ -309,7 +324,7 @@ def write_compose_file(
                 # on slow links (samples are unused: upstream test.sh drops
                 # SAMPLES=, and prepare.sh already made the fetch non-fatal).
                 extra_hosts:
-                  - "fate-suite.ffmpeg.org:127.0.0.1"
+{extra_hosts_lines}{proxy_env_block}
                 entrypoint:
                   - /bin/sh
                   - -c

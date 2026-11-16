@@ -87,6 +87,7 @@ def cybergym_e2e_scorer() -> Scorer:
                     poc_path=poc_path,
                     patch_path=patch_path,
                     compile_timeout=state.metadata.get("validation_compile_timeout"),
+                    setup_proxy=state.metadata.get("setup_proxy"),
                 )
                 results.update(validation_results)
 

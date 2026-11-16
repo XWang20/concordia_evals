@@ -67,34 +67,47 @@ def _start_validation_container(
     build_image: str,
     task_data_dir: Path,
     script_dir: Path,
+    setup_proxy: str | None = None,
 ) -> str:
-    result = _docker(
-        [
-            "run",
-            "-d",
-            "--rm",
-            # MSan/ASan binaries need personality(ADDR_NO_RANDOMIZE) for their
-            # shadow-mmap collision recovery; default seccomp blocks it.
-            "--security-opt",
-            "seccomp=unconfined",
-            # ffmpeg-family tasks rsync FATE samples from fate-suite.ffmpeg.org
-            # during compile (rsync:// port 873); the transfer hangs on slow
-            # links and `|| true` only helps on failure, not on hangs. The
-            # samples are provably unused (upstream's own test.sh drops
-            # SAMPLES=), so fail the fetch fast via localhost.
+    args = [
+        "run",
+        "-d",
+        "--rm",
+        # MSan/ASan binaries need personality(ADDR_NO_RANDOMIZE) for their
+        # shadow-mmap collision recovery; default seccomp blocks it.
+        "--security-opt",
+        "seccomp=unconfined",
+        # ffmpeg-family tasks rsync FATE samples from fate-suite.ffmpeg.org
+        # during compile (rsync:// port 873); the transfer hangs on slow
+        # links and `|| true` only helps on failure, not on hangs. The
+        # samples are provably unused (upstream's own test.sh drops
+        # SAMPLES=), so fail the fetch fast via localhost.
+        "--add-host",
+        "fate-suite.ffmpeg.org:127.0.0.1",
+    ]
+    if setup_proxy is not None:
+        args += [
             "--add-host",
-            "fate-suite.ffmpeg.org:127.0.0.1",
-            "-v",
-            f"{task_data_dir}:/task_data:ro",
-            "-v",
-            f"{script_dir}:/task_scripts:ro",
-            "-w",
-            "/src",
-            build_image,
-            "sleep",
-            "infinity",
+            "hostgw:host-gateway",
+            "-e",
+            f"HTTP_PROXY={setup_proxy}",
+            "-e",
+            f"HTTPS_PROXY={setup_proxy}",
+            "-e",
+            "NO_PROXY=127.0.0.1,localhost",
         ]
-    )
+    args += [
+        "-v",
+        f"{task_data_dir}:/task_data:ro",
+        "-v",
+        f"{script_dir}:/task_scripts:ro",
+        "-w",
+        "/src",
+        build_image,
+        "sleep",
+        "infinity",
+    ]
+    result = _docker(args)
     return result.stdout.strip()
 
 
@@ -206,11 +219,14 @@ def run_stage_validation(
     poc_path: Path | None,
     patch_path: Path | None,
     compile_timeout: int | None = None,
+    setup_proxy: str | None = None,
 ) -> StageStatus:
     """Run one validation stage in a fresh container; return its status."""
     container_id: str | None = None
     try:
-        container_id = _start_validation_container(build_image, task_data_dir, script_dir)
+        container_id = _start_validation_container(
+            build_image, task_data_dir, script_dir, setup_proxy
+        )
         _setup_validation_container(
             container_id,
             build_image=build_image,
@@ -293,6 +309,7 @@ def run_full_validation(
     poc_path: Path | None,
     patch_path: Path | None,
     compile_timeout: int | None = None,
+    setup_proxy: str | None = None,
 ) -> dict[str, StageStatus | None]:
     """Run all applicable stages with upstream's cumulative skip logic."""
     results: dict[str, StageStatus | None] = {
@@ -325,5 +342,6 @@ def run_full_validation(
             poc_path=poc_path,
             patch_path=patch_path,
             compile_timeout=compile_timeout,
+            setup_proxy=setup_proxy,
         )
     return results

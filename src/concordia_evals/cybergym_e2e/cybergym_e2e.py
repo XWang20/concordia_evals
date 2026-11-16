@@ -112,6 +112,7 @@ def build_samples(
     sample_n: int | None = None,
     sample_seed: int = 0,
     sample_method: str = "diverse",
+    setup_proxy: str | None = None,
 ) -> list[Sample]:
     """Build inspect Samples for the selected tasks (downloading as needed)."""
     all_tasks = list_tasks(repo_dir)
@@ -151,7 +152,9 @@ def build_samples(
         # (pull policy "missing"), so we never pre-pull here.
 
         slug = task_path.replace("/", "_")
-        compose_file = write_compose_file(slug, build_image, task_data_dir, script_dir, compose_dir)
+        compose_file = write_compose_file(
+            slug, build_image, task_data_dir, script_dir, compose_dir, setup_proxy
+        )
 
         samples.append(
             Sample(
@@ -172,6 +175,7 @@ def build_samples(
                     "script_dir": str(script_dir),
                     "compose_file": compose_file,
                     "validation_compile_timeout": validation_compile_timeout,
+                    "setup_proxy": setup_proxy,
                 },
             )
         )
@@ -193,6 +197,7 @@ def cybergym_e2e(
     lockdown: bool = True,
     validation_compile_timeout: int | None = None,
     sample_method: str = "diverse",
+    setup_proxy: str | None = None,
     solver: Solver | None = None,
 ) -> Task:
     """CyberGym-E2E evaluation task.
@@ -219,6 +224,10 @@ def cybergym_e2e(
         sample_method: "diverse" (default; distinct projects first, then
             balance source-family/sanitizer coverage) or "stratified"
             (plain project round-robin).
+        setup_proxy: HTTP(S) proxy URL used inside containers during setup
+            and validation (e.g. "http://hostgw:7890"; "hostgw" resolves to
+            the docker host). Prepare-phase git/http fetches can otherwise
+            be too slow on restricted networks. Unused when None.
         lockdown: Disconnect the agent container from all networks after
             setup (the agent bridge still works over loopback/exec).
         validation_compile_timeout: Override the vendored validate.py's
@@ -265,6 +274,7 @@ def cybergym_e2e(
                 sample_n=sample_n,
                 sample_seed=sample_seed,
                 sample_method=sample_method,
+                setup_proxy=setup_proxy,
             )
         ),
         solver=solver,
