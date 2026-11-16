@@ -299,7 +299,10 @@ def write_compose_file(
                 environment:
                   - HTTP_PROXY={setup_proxy}
                   - HTTPS_PROXY={setup_proxy}
-                  - NO_PROXY=127.0.0.1,localhost"""
+                  - http_proxy={setup_proxy}
+                  - https_proxy={setup_proxy}
+                  - NO_PROXY=127.0.0.1,localhost
+                  - no_proxy=127.0.0.1,localhost"""
     compose_dir.mkdir(parents=True, exist_ok=True)
     compose_file = compose_dir / f"{sample_slug}.yaml"
     compose_file.write_text(

@@ -94,7 +94,13 @@ def _start_validation_container(
             "-e",
             f"HTTPS_PROXY={setup_proxy}",
             "-e",
+            f"http_proxy={setup_proxy}",
+            "-e",
+            f"https_proxy={setup_proxy}",
+            "-e",
             "NO_PROXY=127.0.0.1,localhost",
+            "-e",
+            "no_proxy=127.0.0.1,localhost",
         ]
     args += [
         "-v",
