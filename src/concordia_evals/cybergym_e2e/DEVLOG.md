@@ -175,4 +175,16 @@
   28/30 样本完成，27 干净通过（90%）；libxslt/arvo_57436 S4=error、
   zstd/arvo_44239 prepare.sh 1800s 超时、wolfssl 收尾被取消。
   3 题已重试（pid 591812，setsid 脱离会话），结论待补
-- [ ] 3 题重试归因（cron 01M7J99A4AQRXNC705GXWME234 监控中）
+- [x] **3 题重试归因全部完成（2026-11-17 凌晨）**：
+  - zstd/arvo_44239：prepare.sh 的 `make seedcorpora` 用 **wget** 下种子语料，
+    wget 只认小写 `http_proxy`（此前只设大写）→ 直连 177KB/s 撞 1800s 超时。
+    补小写 proxy 变量后 prepare 全程 3.5 分钟
+  - wolfssl：纯被 zstd 失败连坐取消（其 S3 早已通过）
+  - libxslt/arvo_57436：MSan 段错误（`make seed/xpath.stamp` 时 SIGSEGV），
+    是影子区/ASLR 撞车的另一种姿势，seccomp 管不了。
+    **用户在宿主机设置 vm.mmap_rnd_bits=28（持久化 /etc/sysctl.d/）后，
+    S3+S4 全部通过**；另做 100 连跑 MSan 二进制 0 失败确认生效
+  - 附带修复：apt 也只认小写 proxy 变量且 Clash 服务不了 Ubuntu 源（exit 100），
+    容器 apt 配置钉死 Acquire::http(s)::Proxy DIRECT（apt 直连、其余走代理）
+  - 代码新增：eval 启动时检查 /proc/sys/vm/mmap_rnd_bits >28 则大字警告
+- [ ] retry3d 收尾（zstd/wolfssl 预期通过，等最终数字）
