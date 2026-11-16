@@ -167,5 +167,12 @@
   均用 setsid+nohup 脱离会话（runner 日志在 /tmp/cybergym_rerun_ffmpeg.log
   和 /tmp/cybergym_sweep30.log）。数据缓存（3.1GB / 36 项目）与镜像（29 个）
   在重启后保留完好
-- [ ] ffmpeg 任务重跑（inspect eval-retry，进行中）
-- [ ] 30 题 ground_truth patch-only 基建扫雷（seed=0，进行中，--max-samples 4）
+- [x] **ffmpeg 任务重跑 SUCCESS（2026-11-16 晚）**：
+  kimi_code + deepseek-v4.1-flash，修复后环境下 success=1、
+  S1=S2=S3=S4 全 passed（42 min 编译链全部工作正常）。
+  至此 ffmpeg 三连坑（seccomp/编译时限/fate-rsync）全部闭环验证
+- [x] **30 题 ground_truth patch-only 扫雷完成（2026-11-16 晚）**：
+  28/30 样本完成，27 干净通过（90%）；libxslt/arvo_57436 S4=error、
+  zstd/arvo_44239 prepare.sh 1800s 超时、wolfssl 收尾被取消。
+  3 题已重试（pid 591812，setsid 脱离会话），结论待补
+- [ ] 3 题重试归因（cron 01M7J99A4AQRXNC705GXWME234 监控中）
