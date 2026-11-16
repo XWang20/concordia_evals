@@ -38,6 +38,13 @@ find /tmp -mindepth 1 -maxdepth 1 -exec rm -rf {} +
 mkdir -p /out /work
 """
 
+# apt honors lowercase http_proxy and breaks on proxies that can't serve the
+# Ubuntu archives (observed: exit 100). git/wget/curl/pip still use the proxy.
+APT_BYPASS_PROXY = r"""
+mkdir -p /etc/apt/apt.conf.d
+printf 'Acquire::http::Proxy "DIRECT";\nAcquire::https::Proxy "DIRECT";\n' > /etc/apt/apt.conf.d/99-direct
+"""
+
 
 def _sanitized_config_toml(repo_to_patch: str, immutable_files: list[str]) -> str:
     """Config visible inside the container; upstream drops everything else."""
@@ -74,6 +81,7 @@ def setup_workspace() -> Solver:
 
         await _exec("mkdir -p /config /data /output /scripts", "mkdir", timeout=60)
 
+        await _exec(APT_BYPASS_PROXY, "apt bypass proxy", timeout=60)
         await _exec(
             "export DEBIAN_FRONTEND=noninteractive && "
             "apt-get update -qq && apt-get install -y -qq sudo git >/dev/null 2>&1",

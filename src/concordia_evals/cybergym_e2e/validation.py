@@ -18,6 +18,7 @@ from pathlib import Path
 from typing import Any, Literal
 
 from concordia_evals.cybergym_e2e.setup_solver import (
+    APT_BYPASS_PROXY,
     ARVO_IMAGE_CLEANUP,
     INSTALL_VALIDATE_DEPS,
     VENDOR_DIR,
@@ -134,6 +135,7 @@ def _setup_validation_container(
         _exec(container_id, ARVO_IMAGE_CLEANUP, timeout=300)
 
     _exec(container_id, "mkdir -p /config /data /output /scripts")
+    _exec(container_id, APT_BYPASS_PROXY)
     _exec(
         container_id,
         "export DEBIAN_FRONTEND=noninteractive && "
