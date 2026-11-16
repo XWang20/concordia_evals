@@ -109,13 +109,22 @@ def test_diverse_sample(tmp_path):
     for p, lang in [("pa", "c++"), ("pb", "c"), ("pc", "c++")]:
         (repo / "projects" / p).mkdir(parents=True)
         (repo / "projects" / p / "project.toml").write_text(f'name = "{p}"\nlanguage = "{lang}"\n')
-        for i, (src, san) in enumerate([("arvo", "address"), ("arvo", "memory"), ("oss-fuzz", "address"), ("arvo", "undefined")]):
+        for i, (src, san) in enumerate(
+            [
+                ("arvo", "address"),
+                ("arvo", "memory"),
+                ("oss-fuzz", "address"),
+                ("arvo", "undefined"),
+            ]
+        ):
             name = f"{src}_{i}" if src == "arvo" else f"oss-fuzz_{i}"
             d = repo / "projects" / p / name
             d.mkdir()
             (d / "config.toml").write_text(f'task_id = "x:{i}"\n')
             (d / "run_poc.sh").write_text(f"export SANITIZER={san}\n")
-    tasks = [f"{p}/{n}" for p in ("pa", "pb", "pc") for n in ("arvo_0", "arvo_1", "oss-fuzz_2", "arvo_3")]
+    tasks = [
+        f"{p}/{n}" for p in ("pa", "pb", "pc") for n in ("arvo_0", "arvo_1", "oss-fuzz_2", "arvo_3")
+    ]
     a = diverse_sample(tasks, 3, seed=5, repo_dir=repo)
     b = diverse_sample(tasks, 3, seed=5, repo_dir=repo)
     assert a == b and len(a) == 3
