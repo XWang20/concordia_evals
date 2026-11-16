@@ -159,5 +159,13 @@
 - [x] 选题策略落地：sample_n + sample_seed + sample_method=diverse
   （项目去重优先 + source/sanitizer 均衡），30 题清单已生成
   （30 项目 / ASan 17 MSan 7 UBSan 6 / arvo 22 oss-fuzz 8 / c++ 24 c 6）
-- [ ] ffmpeg stage1 用 seccomp+7200s+fate shim 验证（进行中）
-- [ ] ffmpeg 任务用修复后的配置重跑（待 stage1 验证确认后启动）
+- [x] **ffmpeg stage1 验证 PASS**（全部修复生效，41 min：编译成功 +
+  GT PoC 在未打补丁构建上如期崩溃）
+- [x] **事故记录（2026-11-11 晚）**：服务器被同事重启，ffmpeg 重跑
+  （跑到一半，日志状态 started）与 30 题扫雷（还在拉镜像阶段，未产日志）
+  均被杀。2026-11-16 用 `inspect eval-retry` 续跑 ffmpeg、重新发起扫雷，
+  均用 setsid+nohup 脱离会话（runner 日志在 /tmp/cybergym_rerun_ffmpeg.log
+  和 /tmp/cybergym_sweep30.log）。数据缓存（3.1GB / 36 项目）与镜像（29 个）
+  在重启后保留完好
+- [ ] ffmpeg 任务重跑（inspect eval-retry，进行中）
+- [ ] 30 题 ground_truth patch-only 基建扫雷（seed=0，进行中，--max-samples 4）
