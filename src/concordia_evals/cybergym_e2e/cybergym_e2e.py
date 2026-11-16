@@ -17,6 +17,8 @@ Example:
 
 Host prerequisite (sanitizer compatibility, from upstream README):
     sudo sysctl -w vm.mmap_rnd_bits=28
+    (persist across reboots: echo 'vm.mmap_rnd_bits=28' |
+     sudo tee /etc/sysctl.d/60-cybergym.conf)
 """
 
 import logging
@@ -49,6 +51,34 @@ from concordia_evals.cybergym_e2e.scorer import cybergym_e2e_scorer
 from concordia_evals.cybergym_e2e.setup_solver import setup_workspace
 
 logger = logging.getLogger(__name__)
+
+ASLR_SYSCTL_PATH = Path("/proc/sys/vm/mmap_rnd_bits")
+ASLR_RECOMMENDED_MAX = 28
+
+
+def check_aslr_prereq() -> None:
+    """Warn if the host ASLR entropy exceeds the sanitizer requirement.
+
+    MSan (and ASan) shadow-memory mappings collide with randomized layouts;
+    upstream requires vm.mmap_rnd_bits<=28 (their README prerequisite). We
+    can only warn here: the sysctl is host-level and often root-only.
+    """
+    try:
+        value = int(ASLR_SYSCTL_PATH.read_text().strip())
+    except Exception:
+        logger.debug("Cannot read %s; skipping ASLR check", ASLR_SYSCTL_PATH)
+        return
+    if value > ASLR_RECOMMENDED_MAX:
+        logger.warning(
+            "Host vm.mmap_rnd_bits=%d (> %d). MSan-instrumented binaries will "
+            "crash probabilistically (shadow-memory/ASLR collisions), making "
+            "stage results flaky for MSan tasks. Upstream prerequisite: "
+            "sudo sysctl -w vm.mmap_rnd_bits=%d (persist via /etc/sysctl.d/).",
+            value,
+            ASLR_RECOMMENDED_MAX,
+            ASLR_RECOMMENDED_MAX,
+        )
+
 
 # Harness-specific agent options matching upstream's anti-web settings
 # (run_agent.py: claude --disallowedTools ...; codex web_search = "disabled").
@@ -244,6 +274,7 @@ def cybergym_e2e(
     if prompt_style not in ("iterative", "no-test"):
         raise ValueError(f"prompt_style must be 'iterative' or 'no-test', got {prompt_style!r}")
 
+    check_aslr_prereq()
     repo_dir = sync_scripts_repo(REPO_DIR)
 
     if solver is None:

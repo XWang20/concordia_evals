@@ -36,6 +36,8 @@ separately as `found_gt_bug`.
 - `HF_TOKEN` with accepted access to the gated dataset
   [sunblaze-ucb/cybergym-e2e](https://huggingface.co/datasets/sunblaze-ucb/cybergym-e2e).
 - Sanitizer compatibility (from the upstream README): `sudo sysctl -w vm.mmap_rnd_bits=28`.
+  To persist across reboots: `echo 'vm.mmap_rnd_bits=28' | sudo tee /etc/sysctl.d/60-cybergym.conf`.
+  The task warns at startup if the host value exceeds 28.
 
 ## Usage
 
