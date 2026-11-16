@@ -187,4 +187,6 @@
   - 附带修复：apt 也只认小写 proxy 变量且 Clash 服务不了 Ubuntu 源（exit 100），
     容器 apt 配置钉死 Acquire::http(s)::Proxy DIRECT（apt 直连、其余走代理）
   - 代码新增：eval 启动时检查 /proc/sys/vm/mmap_rnd_bits >28 则大字警告
-- [ ] retry3d 收尾（zstd/wolfssl 预期通过，等最终数字）
+- [x] retry3d 收尾（2026-11-17 凌晨）：**zstd S3+S4 通过、wolfssl S3+S4
+  通过**。30 题扫雷最终成绩 30/30 基建干净（100%），其中 3 题各暴露并修复
+  一个环境问题（zstd wget 小写 proxy、wolfssl 评分预算、libxslt 宿主 ASLR）
