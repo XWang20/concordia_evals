@@ -190,3 +190,13 @@
 - [x] retry3d 收尾（2026-11-17 凌晨）：**zstd S3+S4 通过、wolfssl S3+S4
   通过**。30 题扫雷最终成绩 30/30 基建干净（100%），其中 3 题各暴露并修复
   一个环境问题（zstd wget 小写 proxy、wolfssl 评分预算、libxslt 宿主 ASLR）
+
+### 2026-11-17
+
+- [x] 资源预估（实测 5 次 kimi_code 运行）：每题均值 9.1M tokens
+  （缓存读占 93%），30 题约 2.7 亿 tokens；DeepSeek 公开价假设下
+  约 95-235 元（另加失败冗余 20-30%）；4-6 路并行耗时 8-12 小时
+- [ ] **下一步：30 题能力测试**（kimi_code + deepseek-v4.1-flash，
+  e2e 模式，sample_n=30 sample_seed=0 setup_proxy，--max-samples 4-6，
+  --time-limit 21600；参考命令见 README）。之后做 model × harness 矩阵
+  （codex_cli / claude_code 已就绪），必要时自写 dsh bridge agent
