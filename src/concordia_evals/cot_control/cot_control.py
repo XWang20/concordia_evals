@@ -46,7 +46,7 @@ def cot_control_qa_scorer(
 def cot_control(
     dataset: Literal["gpqa", "hle", "mmlu_pro", "all"] = "all",
     modes: str = "all_main",
-    target_reasoning_effort: str | None = "high",
+    target_reasoning_effort: str | None = "default",
     adversarial_pressure: str = "na",
     non_reasoning: bool = False,
     monitor_aware: bool = False,

@@ -40,7 +40,7 @@ uv run inspect score path/to/log.eval \
 | Parameter | Default | Description |
 | --- | --- | --- |
 | `dataset` | `'all'` | `'all'`, `'gpqa_physics'`, or `'aime_math'` |
-| `target_reasoning_effort` | `'medium'` | Evaluated-model reasoning effort (`'default'` omits `reasoning_effort`) |
+| `target_reasoning_effort` | `'default'` | Evaluated-model reasoning effort (`'default'` omits `reasoning_effort`) |
 | `monitor_model` | `None` | Fallback monitor model (`--model-role monitor=...`, `INSPECT_EVALS_JUDGE_MODEL`, else `'openai/gpt-4o'`) |
 | `scopes` | `'cot_only'` | Comma-separated upstream monitor scopes |
 | `limit` | `None` | Optional cap on total samples |

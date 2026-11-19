@@ -43,7 +43,7 @@ uv run inspect score path/to/log.eval \
 | --- | --- | --- |
 | `dataset` | `'all'` | `'gpqa'`, `'hle'`, `'mmlu_pro'`, or `'all'` |
 | `modes` | `'all_main'` | Comma-separated modes, `'all_main'`, or `'all_with_baseline'` |
-| `target_reasoning_effort` | `'high'` | Evaluated-model reasoning effort (`'default'` omits `reasoning_effort`) |
+| `target_reasoning_effort` | `'default'` | Evaluated-model reasoning effort (`'default'` omits `reasoning_effort`) |
 | `sample_limit_per_mode` | `None` | Optional cap per dataset and mode before merging (`None` uses all samples) |
 | `adversarial_pressure` | `'na'` | Upstream prompt-pressure variant |
 | `non_reasoning` | `False` | Use the upstream non-reasoning prompt variant |

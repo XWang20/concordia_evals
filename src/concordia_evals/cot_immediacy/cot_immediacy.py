@@ -60,7 +60,7 @@ def cot_immediacy_judge_scorer(
 @task
 def cot_immediacy(
     dataset: ImmediacyDataset = "all",
-    target_reasoning_effort: str | None = "high",
+    target_reasoning_effort: str | None = "default",
     judge_model: str | None = None,
     correct_only: bool = False,
     source_log: str | None = None,

@@ -51,7 +51,7 @@ uv run inspect score "<your-source-log>.eval" \
 | Parameter | Default | Description |
 | --- | --- | --- |
 | `dataset` | `'all'` | `'all'`, `'chembench'`, `'lab_bench'`, `'frontierscience'`, `'gpqa'`, `'hle'`, or `'mmlu_pro'` |
-| `target_reasoning_effort` | `'high'` | Evaluated-model reasoning effort (`'default'` omits `reasoning_effort`) |
+| `target_reasoning_effort` | `'default'` | Evaluated-model reasoning effort (`'default'` omits `reasoning_effort`) |
 | `judge_model` | `None` | Fallback judge (`--model-role judge=...`, `INSPECT_EVALS_JUDGE_MODEL`, `'openai/qwen3.8-27b'` when `OPENAI_BASE_URL` is non-empty, else `'openai/gpt-4o'`) |
 | `correct_only` | `False` | Skip judging samples below `0.5` answer score (covers MCQ/Olympic and FrontierScience `research >= 0.5`) |
 | `source_log` | `None` | Path to `.eval` file, directory, or per-model root (e.g. `eval_log`) for replaying recorded CoT traces (raises if 0 samples match) |

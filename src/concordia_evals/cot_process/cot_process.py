@@ -51,7 +51,7 @@ def openai_process_scorer(
 @task
 def cot_process(
     dataset: Literal["all", "gpqa_physics", "aime_math"] = "all",
-    target_reasoning_effort: str | None = "medium",
+    target_reasoning_effort: str | None = "default",
     monitor_model: str | None = DEFAULT_COT_PROCESS_MONITOR_MODEL,
     scopes: str = "cot_only",
     limit: int | None = None,
